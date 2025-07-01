@@ -129,13 +129,28 @@ def get_hotels():
         return jsonify(hotels_list)
 
     except psycopg2.Error as db_error:
+        # Veritabanı ile ilgili bir hata olursa...
+        error_trace = traceback.format_exc()
+        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        print("!!! /api/hotels VERİTABANI HATASI !!!")
+        print(f"!!! HATA MESAJI: {db_error}")
+        print("!!! TRACEBACK:")
+        print(error_trace)
+        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         if conn: conn.rollback()
-        print(f"VERİTABANI HATASI (get_hotels): {db_error}")
-        return jsonify({"error": "Veritabanı hatası: " + str(db_error)}), 500
+        return jsonify({"error": "Veritabanı ile ilgili bir sorun oluştu. Detaylar loglandı."}), 500
+        
     except Exception as e:
+        # Veritabanı dışındaki genel bir Python hatası olursa...
+        error_trace = traceback.format_exc()
+        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        print("!!! /api/hotels GENEL HATA !!!")
+        print(f"!!! HATA MESAJI: {e}")
+        print("!!! TRACEBACK:")
+        print(error_trace)
+        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         if conn: conn.rollback()
-        print(f"Genel bir hata oluştu (get_hotels): {e}") 
-        return jsonify({"error": "Sunucu hatası: " + str(e)}), 500
+        return jsonify({"error": "Sunucuda beklenmedik bir hata oluştu. Detaylar loglandı."}), 500
 
 @app.route("/api/init-hotels")
 def insert_hotels():
