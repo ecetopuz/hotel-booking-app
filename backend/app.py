@@ -1,5 +1,5 @@
 
-# --- 1. GEREKLİ KÜTÜPHANELERİ İÇE AKTAR ---
+# --- 1. GEREKLİ KÜTÜPHANELER ---
 import os
 import re
 from flask import Flask, jsonify, request
@@ -10,39 +10,38 @@ from flask_jwt_extended import create_access_token, JWTManager
 from datetime import date, timedelta
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
-import requests # Bu, genel HTTP istekleri için
+import requests 
 # --- 2. UYGULAMA KURULUMU VE YAPILANDIRMASI ---
 
 app = Flask(__name__)
 
-# CORS'u tüm uygulama için etkinleştir
+
 CORS(app) 
 
-# Uygulama için gizli anahtarları ve yapılandırmaları ayarla
-# Gerçek uygulamalarda bu bilgileri ortam değişkenlerinden (environment variables) almalısınız.
+
 app.config["JWT_SECRET_KEY"] = "bu-jwt-icin-kullanilan-gizli-anahtar" 
 app.config['UPLOAD_FOLDER'] = 'uploads'
 
-# Yükleme klasörünün var olduğundan emin ol
+
 if not os.path.exists(app.config['UPLOAD_FOLDER']):
     os.makedirs(app.config['UPLOAD_FOLDER'])
 
-# --- 3. EKLENTİLERİ (EXTENSIONS) BAŞLAT ---
-# Tüm eklentileri, oluşturduğumuz tek 'app' nesnesi ile başlatıyoruz.
+# --- 3. EKLENTİLERİ  ---
+
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
 
-# --- 4. VERİTABANI BAĞLANTISI ---
-# Bu bağlantıyı her istekte yeniden kurmak yerine, uygulama bağlamında yönetmek daha iyidir,
-# ama şimdilik bu şekilde çalışacaktır.
-conn = psycopg2.connect(
-    dbname="hotel_booking",        
-    user="postgres",               
-    password="12345",              
-    host="localhost",              
-    port="5432"                    
-)
-
+# --- 4. VERİTABANI  ---
+#
+#conn = psycopg2.connect(
+#    dbname="hotel_booking",        
+#    user="postgres",               
+#    password="12345",              
+#    host="localhost",              
+#    port="5432"                    
+#)
+DATABASE_URL = os.environ.get("DATABASE_URL","postgresql://postgres:12345@localhost:5432/hotel_booking")   
+conn = psycopg2.connect(DATABASE_URL)
 # --- 5. YARDIMCI FONKSİYONLAR ---
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 def allowed_file(filename):
@@ -56,21 +55,20 @@ def allowed_file(filename):
 @app.route("/api/hotels")
 def get_hotels():
     try:
-        # 1. Frontend'den gelen arama parametrelerini al (varsa)
+        
         destination_query = request.args.get('destination')
         start_date_str = request.args.get('start_date')
         end_date_str = request.args.get('end_date')
         guests_str = request.args.get('guests')
 
-        # 2. Anasayfa veya Filtreli Arama kontrolü yap
-        # Eğer tarih veya misafir sayısı gibi temel arama kriterleri yoksa,
-        # bu bir anasayfa isteğidir.
+        
+        
         is_search_request = bool(start_date_str and end_date_str and guests_str)
 
         cur = conn.cursor()
 
         if is_search_request:
-            # --- FİLTRELİ ARAMA MANTIĞI (KULLANICI ARAMA YAPTIĞINDA) ---
+            # --- FİLTRELİ ARAMA  ---
             try:
                 guests = int(guests_str)
             except (ValueError, TypeError):
@@ -101,8 +99,8 @@ def get_hotels():
             cur.execute(base_query, tuple(params))
 
         else:
-            # --- ANASAYFA MANTIĞI (İLK YÜKLEME) ---
-            # Herhangi bir filtre olmadan, en yüksek puanlı otelleri listele
+            # --- ANASAYFA  ---
+            # filtresiz, en yüksek puanlı otelleri listele
             cur.execute("""
                 SELECT id, name, city, country, price, rating, comments, 
                        member_price, latitude, longitude, hotel_image_url, 
@@ -112,13 +110,13 @@ def get_hotels():
                 LIMIT 20
             """)
 
-        # 3. Sonuçları al ve JSON'a çevir (bu kısım her iki durum için de ortak)
+        
         rows = cur.fetchall()
         cur.close()
 
         hotels_list = []
         for row in rows:
-            # Sütun sıraları iki sorgu için de aynı, bu yüzden bu blok ortak kullanılabilir.
+            
             hotels_list.append({
                 "id": row[0], "name": row[1], "city": row[2], "country": row[3],
                 "price": float(row[4]) if row[4] is not None else 0.0,
@@ -151,7 +149,7 @@ def insert_hotels():
     try:
         cur = conn.cursor()
         for hotel in hotels:
-            # DÜZELTME: city ve country sütunları eklendi.
+            
             cur.execute("""
                 INSERT INTO hotels (name, city, country, price, rating, comments, member_price, latitude, longitude)
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT (name) DO NOTHING
@@ -167,13 +165,12 @@ def insert_hotels():
         return jsonify({"error": str(e)}), 500
     
 
-# GÜNCELLENMİŞ KULLANICI KAYDI (REGISTER) ENDPOINT'İ
-# app.py
+
 
 @app.route('/api/register', methods=['POST'])
 def register():
     try:
-        # Form verilerini al
+        
         name = request.form.get('name')
         surname = request.form.get('surname')
         email = request.form.get('email')
@@ -182,7 +179,7 @@ def register():
         city = request.form.get('city')
         photo_file = request.files.get('photo')
 
-        # ... (Diğer kontrolleriniz aynı kalıyor) ...
+        
         if not all([name, surname, email, password, country, city]):
             return jsonify({"error": "Tüm zorunlu alanlar doldurulmalıdır."}), 400
 
@@ -197,26 +194,25 @@ def register():
 
         hashed_password = generate_password_hash(password)
         
-        # --- İSİM DÜZELTMESİ BURADA (Değişken adı) ---
-        # Değişken adını da veritabanıyla tutarlı hale getirelim: photo_url_to_db
+        
         photo_url_to_db = None
         if photo_file and allowed_file(photo_file.filename):
             filename = secure_filename(photo_file.filename)
             file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             photo_file.save(file_path)
-            # request.host_url yerine sadece /uploads/filename kullanmak daha esnek olabilir
+            
             photo_url_to_db = f"/uploads/{filename}" 
 
-        # Ad ve soyadı birleştirerek tam bir isim oluştur
+        
         full_name = f"{name} {surname}"
         
-        # --- ✅ SQL SORGUSU DÜZELTMESİ BURADA ---
+        
         cur.execute(
             """
             INSERT INTO users (name, email, password_hash, country, city, photo_url)
             VALUES (%s, %s, %s, %s, %s, %s) RETURNING id
             """,
-            # Parametreleri de doğru değişkenle gönder
+            
             (full_name, email, hashed_password, country, city, photo_url_to_db)
         )
         new_user_id = cur.fetchone()[0]
@@ -226,8 +222,8 @@ def register():
 
         display_name = name 
         access_token = create_access_token(
-        identity=new_user_id,  # Ana kimlik olarak sadece kullanıcı ID'sini kullanalım
-        additional_claims={'name': display_name} # Ek bilgi olarak ismi ekleyelim
+        identity=new_user_id,  
+        additional_claims={'name': display_name} 
 )
         
         return jsonify({
@@ -239,7 +235,7 @@ def register():
         if conn: conn.rollback()
         print(f"Kayıt sırasında hata: {e}")
         return jsonify({"error": "Sunucuda bir hata oluştu."}), 500
-# 2. KULLANICI GİRİŞİ (LOGIN)
+# 2. KULLANICI GİRİŞİ 
 @app.route("/api/login", methods=["POST"])
 def login_user():
     data = request.get_json()
@@ -251,19 +247,18 @@ def login_user():
 
     try:
         cur = conn.cursor()
-        # Kullanıcının tam adını 'name' sütunundan çekiyoruz
+        
         cur.execute("SELECT id, password_hash, name FROM users WHERE email = %s", (email,))
         user = cur.fetchone()
         cur.close()
 
         if user and check_password_hash(user[1], password):
-            # Eğer kullanıcı varsa VE şifre doğruysa...
+            
             user_id = user[0]
             full_name = user[2]
             display_name = full_name.split(' ')[0]
             
-            # Token oluştururken kullanıcının sadece ilk adını alalım (daha güzel görünür)
-            # "Merhaba, Ali Veli" yerine "Merhaba, Ali" demek için
+            
              
             
             access_token = create_access_token(
@@ -309,7 +304,7 @@ def get_hotel_details(hotel_id):
             "photo": hotel_row[10], "specialDiscountRate": special_rate
         }
         
-        # ... (Yorumlar ve İmkanlar için olan kodlarınız aynı kalıyor) ...
+       
         
         # 2. Yorumları ve Puan Dağılımını Çek ve `hotel_details` objesine ekle
         cur.execute("""
@@ -319,18 +314,18 @@ def get_hotel_details(hotel_id):
         """, (hotel_id,))
         
         comments_data = cur.fetchall()
-        # Başlangıçta boş diziler oluştur
+        
         hotel_details["comments"] = []
         hotel_details["ratingDistribution"] = []
         category_ratings = {}
 
         for row in comments_data:
-            # Yorumu `comments` listesine ekle
+            
             hotel_details["comments"].append({
                 "author": row[0], "rating": float(row[1]), "title": row[2], 
                 "text": row[3], "date": row[4].isoformat()
             })
-            # Puan dağılımı için veriyi topla
+            
             category = row[5]
             rating = float(row[1])
             if category:
@@ -338,14 +333,14 @@ def get_hotel_details(hotel_id):
                     category_ratings[category] = []
                 category_ratings[category].append(rating)
 
-        # Toplanan veriden puan dağılımını hesapla ve ekle
+        
         for category, ratings in category_ratings.items():
             average_rating = sum(ratings) / len(ratings)
             hotel_details["ratingDistribution"].append({
                 "category": category, "score": round(average_rating, 1)
             })
 
-        # 3. İmkanları Çek ve `hotel_details` objesine ekle
+        
         cur.execute("""
             SELECT a.name, a.icon_name FROM hotel_amenities ha
             JOIN amenities a ON ha.amenity_id = a.id
@@ -360,10 +355,9 @@ def get_hotel_details(hotel_id):
         if conn: conn.rollback()
         print(f"Otel detayı alınırken hata: {e}")
         return jsonify({"error": "Sunucu hatası: " + str(e)}), 500
-# --- UYGULAMAYI ÇALIŞTIR ---
+
 if __name__ == "__main__":
-    # debug=True modunu geliştirme aşamasında kullanın.
-    # Production'da (canlıda) bir WSGI sunucusu (Gunicorn, uWSGI) kullanın.
+    
     app.run(debug=True, port=5000)
 
     
