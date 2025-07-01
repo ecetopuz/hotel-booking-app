@@ -1,7 +1,7 @@
-<!-- src/pages/MapResults.vue -->
+
 <template>
   <div class="map-container">
-    <!-- Geri dön butonu -->
+    
     <router-link to="/" class="back-button">← Ana Sayfaya Geri Dön</router-link>
 
     <!-- Harita -->
@@ -17,7 +17,7 @@
         name="OpenStreetMap"
       ></l-tile-layer>
 
-      <!-- Otel pinleri (marker) döngü ile ekleniyor -->
+      
       <l-marker 
         v-for="hotel in hotels" 
         :key="hotel.id" 
@@ -30,7 +30,7 @@
       </l-marker>
     </l-map>
 
-    <!-- Eğer hiç otel yoksa uyarı göster -->
+    
     <div v-if="hotels.length === 0" class="no-results-overlay">
       Haritada gösterilecek otel bulunamadı. <br>
       Lütfen anasayfadan bir arama yapın.
@@ -40,9 +40,9 @@
 
 <script>
 import { LMap, LTileLayer, LMarker, LPopup } from "@vue-leaflet/vue-leaflet";
-import { ref, onMounted, nextTick } from 'vue'; // nextTick eklendi
+import { ref, onMounted, nextTick } from 'vue'; // nextTick 
 import "leaflet/dist/leaflet.css";
-import { hotelStore } from '../store/hotelStore.js'; // Store import edildi
+import { hotelStore } from '../store/hotelStore.js'; 
 
 export default {
   name: "MapResults",
@@ -55,27 +55,26 @@ export default {
   setup() {
     const map = ref(null);
     const zoom = ref(10);
-    // ⬇️ DEĞİŞİKLİK: Haritanın merkezini ve otel listesini doğrudan store'dan alacağız.
-    const center = ref([37.0, 35.0]); // Varsayılan merkez: Türkiye geneli
-    const hotels = ref([]); // Otel verilerini tutacak reaktif dizi
+    
+    const center = ref([37.0, 35.0]); 
+    const hotels = ref([]); 
 
     onMounted(async () => {
-      // ⬇️ DEĞİŞİKLİK: API'den veri çekmek yerine, veriyi hotelStore'dan alıyoruz.
+      
       const hotelsFromStore = hotelStore.filteredHotels.filter(h => h.lat && h.lng);
       
-      // Alınan veriyi bu bileşenin kendi 'hotels' listesine atıyoruz.
+     
       hotels.value = hotelsFromStore;
 
-      // DOM güncellendikten sonra harita işlemlerini yap
+      
       await nextTick();
 
       if (map.value && hotels.value.length > 0) {
-        // Eğer filtrelenmiş oteller varsa, haritayı bu otelleri kapsayacak şekilde ayarla
+       
         const bounds = hotels.value.map(h => [h.lat, h.lng]);
         map.value.leafletObject.fitBounds(bounds, { padding: [50, 50] });
       } else {
-        // Eğer store'da otel yoksa (kullanıcı direkt bu sayfaya geldiyse),
-        // haritayı varsayılan merkez ve zoom seviyesinde bırak.
+        
         console.log("Store'da gösterilecek otel bulunamadı. Harita varsayılan merkezde açılıyor.");
       }
     });
@@ -84,7 +83,7 @@ export default {
       map, 
       zoom, 
       center,
-      hotels, // <-- template'de kullanmak için return et
+      hotels, 
     };
   },
 };
@@ -110,7 +109,7 @@ export default {
   font-weight: bold;
   box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
-.no-results-overlay { /* <-- YENİ */
+.no-results-overlay { 
     position: absolute;
     top: 0;
     left: 0;
@@ -124,6 +123,6 @@ export default {
     text-align: center;
     font-size: 1.5em;
     z-index: 2000;
-    pointer-events: none; /* Altındaki haritaya tıklanabilmesini sağlar */
+    pointer-events: none; 
 }
 </style>

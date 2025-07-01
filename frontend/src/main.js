@@ -13,7 +13,7 @@ const app = createApp(App)
 // ❌ KALDIRILDI: GoogleSignInPlugin'in app.use() ile kurulumu
 /*
 app.use(GoogleSignInPlugin, {
-  // Client ID'niz aynı kalıyor.
+  // Client ID'niz aynı kalıyor.git
   clientId: '659956907252-7km6e82iuv0gongd3ilnrsmb0chm7gho.apps.googleusercontent.com'
 })
 */

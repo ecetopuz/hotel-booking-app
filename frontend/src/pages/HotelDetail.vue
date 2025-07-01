@@ -1,17 +1,16 @@
-<!-- src/pages/HotelDetail.vue -->
-<!-- src/pages/HotelDetail.vue -->
+
 <template>
   <div class="page-container">
-    <!-- 1. Yükleniyor durumu için bir div -->
+    
     <div v-if="loading" class="loading-state">Otel bilgileri yükleniyor...</div>
     
-    <!-- 2. Hata durumu için bir div -->
+    
     <div v-else-if="error" class="error-state">{{ error }}</div>
     
-    <!-- 3. Veri yüklendiğinde gösterilecek ana div -->
+    
     <div v-else-if="hotel" class="hotel-detail-container">
       
-      <!-- 1. SOL SÜTUN: Ana içerik -->
+      
       <div class="left-column">
         <header class="hotel-header">
           <h1>{{ hotel.name }}</h1>
@@ -64,7 +63,7 @@
         </div>
       </div>
 
-      <!-- 2. SAĞ SÜTUN: Harita, Adres ve Fiyat -->
+      
       <div class="right-column">
         <div class="map-widget">
           <mini-map 
@@ -78,13 +77,11 @@
           <p>{{ hotel.city }}, {{ hotel.country }}</p>
         </div>
         
-        <!-- ================================================================ -->
-        <!-- === FİYAT KARTININ GÜNCELLENMİŞ HALİ === -->
-        <!-- ================================================================ -->
+        
         <div class="price-box">
           <h3>Gecelik Fiyat</h3>
           
-          <!-- Yeni, tutarlı fiyat gösterim bölümü -->
+          
           <div class="price-section-detail">
             <div v-if="hotel.specialDiscountRate" class="discount-badge">
               %{{ hotel.specialDiscountRate }} indirim
@@ -99,7 +96,7 @@
             </div>
           </div>
 
-          <!-- Üye Fiyatı Bölümü -->
+         
           <div v-if="isLoggedIn && hotel.memberPrice" class="member-price-highlight-section">
             <div class="member-benefit-tag">
               <span>💎 Üye Fiyatı</span>
@@ -107,7 +104,7 @@
             <p class="member-price-value">{{ formatPrice(hotel.memberPrice) }}</p>
           </div>
           
-          <!-- Giriş Yapmamış Kullanıcı İçin Uyarı -->
+          
           <div v-if="!isLoggedIn && hotel.memberPrice" class="login-prompt-section">
               <p class="login-for-member-price">
                 Üye fiyatını görmek için <router-link to="/login" @click.stop>giriş yapın</router-link>
@@ -137,20 +134,20 @@ export default {
     }
   },
   
-  // --- SETUP FONKSİYONU BAŞLANGICI ---
+  
   setup(props) {
-    // 1. Reaktif değişkenleri tanımla
+    
     const hotel = ref(null);
     const loading = ref(true);
     const error = ref(null);
 
-    // 2. YARDIMCI FONKSİYONLARI TANIMLA (Hepsi aynı seviyede)
+    
     
     const formatPrice = (price) => {
         return price ? price.toLocaleString('tr-TR', { style: 'currency', currency: 'TRY' }) : 'Fiyat bilgisi yok';
     };
     
-    // getRatingText burada, fetchHotelDetails'ın DIŞINDA tanımlanmalı
+    
     const getRatingText = (score) => {
       if (!score) return ''; 
       if (score >= 9) return 'Olağanüstü';
@@ -159,7 +156,7 @@ export default {
       return 'Değerlendirildi';
     };
 
-    // 3. ANA FONKSİYONU TANIMLA
+    
     
     const fetchHotelDetails = async () => {
       loading.value = true;
@@ -175,12 +172,11 @@ export default {
       }
     };
 
-    // 4. LIFECYCLE HOOK'UNU KULLAN
+    
     
     onMounted(fetchHotelDetails);
 
-    // 5. TEMPLATE'DE KULLANILACAK HER ŞEYİ RETURN ET
-    // Artık hem formatPrice hem de getRatingText doğru şekilde erişilebilir.
+    
     return { 
       hotel, 
       loading, 
@@ -189,31 +185,31 @@ export default {
       getRatingText 
     }; 
   }
-  // --- SETUP FONKSİYONU BİTİŞİ ---
+ 
 }
 </script>
 
 <style scoped>
 .page-container {
   padding: 20px;
-  background-color: #f7f7f7; /* Sayfa arkasına hafif bir renk verebiliriz */
+  background-color: #f7f7f7;
 }
 .hotel-detail-container {
   display: flex;
-  flex-wrap: wrap; /* Küçük ekranlarda alt alta geçsin */
+  flex-wrap: wrap; 
   gap: 30px;
   max-width: 1200px;
   margin: 0 auto;
 }
 .left-column {
-  flex: 2; /* Sol sütun, sağ sütunun 2 katı genişliğinde olsun */
-  min-width: 300px; /* Esnerken çok küçülmesin */
+  flex: 2; 
+  min-width: 300px; 
 }
 .right-column {
   flex: 1;
-  position: sticky; /* Sayfa kaydırılınca sağ sütun sabit kalsın */
-  top: 20px; /* Yukarıdan ne kadar boşluk bırakacağı */
-  align-self: flex-start; /* Kendini yukarıya hizala */
+  position: sticky; 
+  top: 20px; 
+  align-self: flex-start; 
 }
 .hotel-header h1 {
   margin-top: 0;
@@ -237,7 +233,7 @@ export default {
   width: 100%;
   border-radius: 10px;
   margin-top: 20px;
-  object-fit: cover; /* Resmin oranını bozmadan alanı kaplamasını sağlar */
+  object-fit: cover; 
 }
 h2 {
   margin-top: 40px;
@@ -319,7 +315,7 @@ h2 {
 }
 
 .category-name {
-  width: 150px; /* Kategori isimleri için sabit genişlik */
+  width: 150px; 
   flex-shrink: 0;
 }
 
@@ -333,7 +329,7 @@ h2 {
 
 .bar {
   height: 100%;
-  background-color: #003580; /* Koyu mavi */
+  background-color: #003580; 
   border-radius: 4px;
 }
 

@@ -1,17 +1,10 @@
 <template>
   <div class="login-page">
     <div class="form-container">
-      <!-- GİRİŞ FORMU -->
+      
       <div v-if="!isRegisterMode" class="form-box">
         <h2>Giriş Yap</h2>
-        <!-- ❌ KALDIRILDI: GoogleSignInButton ve ayırıcı div -->
-        <!--
-        <GoogleSignInButton
-          @success="handleGoogleLoginSuccess"
-          @error="handleGoogleLoginError"
-        ></GoogleSignInButton>
-        <div class="separator">veya</div>
-        -->
+       
         <form @submit.prevent="handleLogin">
           <div class="input-group">
             <label for="login-email">Kullanıcı email:</label>

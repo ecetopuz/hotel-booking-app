@@ -8,7 +8,7 @@
 
 .form-container {
   display: flex;
-  gap: 50px; /* İki form arasında boşluk (eğer yan yana gösterilseydi) */
+  gap: 50px; 
   background-color: white;
   padding: 40px;
   border-radius: 12px;
@@ -61,7 +61,7 @@
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 8px;
-  box-sizing: border-box; /* Önemli */
+  box-sizing: border-box; 
 }
 
 .input-group input[type="file"] {
