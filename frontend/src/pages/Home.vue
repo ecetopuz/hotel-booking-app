@@ -155,8 +155,8 @@ export default {
   methods: {
     async searchHotels() {
   try {
-    const apiUrl = 'http://localhost:5000/api/hotels';
-
+   // const apiUrl = 'http://localhost:5000/api/hotels';
+      const apiUrl = 'https://hotel-booking-app-095q.onrender.com/api/hotels';
     const params = {
       guests: this.guestCount,
       

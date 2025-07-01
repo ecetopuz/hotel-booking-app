@@ -162,7 +162,8 @@ export default {
       loading.value = true;
       error.value = null;
       try {
-        const response = await axios.get(`http://localhost:5000/api/hotel/${props.id}`);
+        //const response = await axios.get(`http://localhost:5000/api/hotel/${props.id}`);
+        const response = await axios.get(`https://hotel-booking-app-095q.onrender.com/api/hotel/${props.id}`);
         hotel.value = response.data;
       } catch (err) {
         error.value = 'Otel bilgileri yüklenemedi. Lütfen daha sonra tekrar deneyin.';

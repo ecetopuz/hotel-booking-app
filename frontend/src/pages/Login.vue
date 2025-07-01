@@ -85,8 +85,8 @@ import axios from 'axios';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
-const API_URL = 'http://localhost:5000';
-
+//const API_URL = 'http://localhost:5000';
+const API_URL = 'https://hotel-booking-app-095q.onrender.com';
 export default {
   name: 'Login',
   components: {},
