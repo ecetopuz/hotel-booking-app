@@ -7,7 +7,7 @@ Bu proje, kullanıcıların otel araması yapabildiği, detaylarını görebildi
 ## 🚀 Canlı Demo Linkleri
 
 *   **Frontend (Kullanıcı Arayüzü):** [(https://hotel-booking-app-frontend-5wfj.onrender.com)](https://hotel-booking-app-frontend-5wfj.onrender.com)  
-*   
+  
 
 ---
 
